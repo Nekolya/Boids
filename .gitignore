@@ -123,5 +123,5 @@ dmypy.json
 .pyre/
 .idea
 __pycache__
-.idea
-.xml
+*.idea
+*.xml
