@@ -125,3 +125,5 @@ dmypy.json
 __pycache__
 *.idea
 *.xml
+*.psd
+*.pyc
