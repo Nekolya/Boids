@@ -11,7 +11,7 @@ W = 1024
 H = 600
 lenght_clown = 120
 
-lenght_barracuda = 10
+lenght_barracuda = 4
 clownfishes = []
 barracudas = []
 

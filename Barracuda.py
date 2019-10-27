@@ -60,7 +60,10 @@ class Barracuda(Boid):
         self.dx = (self.dx*5 + self.avoid_dx + self.aligm_dx/3 + self.cohes_dx/3 + self.hunt_dx)/2
         self.dy = (self.dy*5 + self.avoid_dy + self.aligm_dy/3 + self.cohes_dy/3 + self.hunt_dy)/2
         self.speed_limit()
-
+        rand = random.randint(0, 5000)
+        if rand == 1:
+            self.dx = -self.dx
+            self.dy = -self.dy
         self.x += self.dx
         self.y += self.dy
         self.update()
@@ -69,8 +72,8 @@ class Barracuda(Boid):
         if self.avoid_rect.colliderect(clown.avoid_rect):
             x = clown.x - self.x
             y = clown.x - self.x
-            cot = abs(x/y /8)
-            tan = abs(y/x /8)
+            cot = abs(x/y)
+            tan = abs(y/x)
             if x > 0:
                 self.hunt_dx += cot
             else:
@@ -79,3 +82,6 @@ class Barracuda(Boid):
                 self.hunt_dy += tan
             else:
                 self.hunt_dy += -tan
+
+            self.aligm_dx = self.hunt_dx
+            self.aligm_dy = self.hunt_dy
