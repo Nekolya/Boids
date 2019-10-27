@@ -1,21 +1,30 @@
 # здесь подключаются модули
 import pygame
+from Clownfish import Clownfish
+from Barracuda import Barracuda
 from Boid import Boid
 import time
- 
+
 # здесь определяются константы, классы и функции
 FPS = 200
 W = 1024
 H = 600
-lenght = 120
-boids = []
-for b in range(lenght):
-    boids.append(Boid(W, H))
+lenght_clown = 120
+
+lenght_barracuda = 10
+clownfishes = []
+barracudas = []
+
+for b in range(lenght_clown):
+    clownfishes.append(Clownfish(W, H))
+
+for b in range(lenght_barracuda):
+    barracudas.append(Barracuda(W, H))
  
 # здесь происходит инициация, создание объектов и др.
 pygame.init()
 win = pygame.display.set_mode((W, H))
-pygame.display.set_icon(pygame.image.load("icon.png"))
+pygame.display.set_icon(pygame.image.load("images/icon.png"))
 
 pygame.display.set_caption("Coral fishes")
 
@@ -23,13 +32,30 @@ clock = pygame.time.Clock()
 
 # если надо до цикла отобразить объекты на экране
 pygame.display.update()
-sprite = pygame.image.load("fish.png")
-sprite2 = pygame.image.load("fish2.png")
-sprite3 = pygame.image.load("fish3.png")
-sprite4 = pygame.image.load("fish4.png")
-sprite5 = pygame.image.load("fish5.png")
-seaweed = pygame.transform.scale(pygame.image.load("seaweed.png"), (70, 310))
-corals = pygame.transform.scale(pygame.image.load("coral_reef.png"), (W+20, 220))
+
+mode = 0
+
+if mode:
+    FPS = 120
+    sprite = pygame.transform.scale(pygame.image.load("images/fish.png"), (8, 17))
+    sprite2 = pygame.transform.scale(pygame.image.load("images/fish2.png"), (8, 17))
+    sprite3 = pygame.transform.scale(pygame.image.load("images/fish3.png"), (8, 17))
+    sprite4 = pygame.transform.scale(pygame.image.load("images/fish4.png"), (8, 17))
+    sprite5 = pygame.transform.scale(pygame.image.load("images/fish5.png"), (8, 17))
+    barracuda_sprite = pygame.transform.scale(pygame.image.load("images/barracuda2.png"), (9, 30))
+else:
+    sprite = pygame.transform.scale(pygame.image.load("images/fish.png"), (10, 20))
+    sprite2 = pygame.transform.scale(pygame.image.load("images/fish2.png"), (10, 20))
+    sprite3 = pygame.transform.scale(pygame.image.load("images/fish3.png"), (10, 20))
+    sprite4 = pygame.transform.scale(pygame.image.load("images/fish4.png"), (10, 20))
+    sprite5 = pygame.transform.scale(pygame.image.load("images/fish5.png"), (10, 20))
+    barracuda_sprite = pygame.transform.scale(pygame.image.load("images/barracuda2.png"), (12, 40))
+
+seaweed = pygame.transform.scale(pygame.image.load("images/seaweed.png"), (70, 310))
+corals = pygame.transform.scale(pygame.image.load("images/coral_reef.png"), (W+20, 220))
+
+
+
 
 #sprite = pygame.transform.scale(sprite, (13, 20))
 #sprite = pygame.transform.scale(sprite, (15, 25))
@@ -38,6 +64,7 @@ corals = pygame.transform.scale(pygame.image.load("coral_reef.png"), (W+20, 220)
 #back = pygame.transform.scale(back, (W, H))
 checker = 0
 
+#time.sleep(20)
 
 # главный цикл
 while True:
@@ -64,26 +91,51 @@ while True:
 
 
     counter = 0
-    for boid in boids:
+    for clown in clownfishes:
+
         counter += 1
         if counter % 5 == 0:
-            win.blit(pygame.transform.rotate(sprite2, boid.angle), (boid.x, boid.y))
+            win.blit(pygame.transform.rotate(sprite2, clown.angle), (clown.x, clown.y))
         elif counter % 6 == 0:
-            win.blit(pygame.transform.rotate(sprite3, boid.angle), (boid.x, boid.y))
+            win.blit(pygame.transform.rotate(sprite3, clown.angle), (clown.x, clown.y))
         elif counter % 4 == 0:
-            win.blit(pygame.transform.rotate(sprite4, boid.angle), (boid.x, boid.y))
+            win.blit(pygame.transform.rotate(sprite4, clown.angle), (clown.x, clown.y))
         elif counter % 7 == 0:
-            win.blit(pygame.transform.rotate(sprite5, boid.angle), (boid.x, boid.y))
+            win.blit(pygame.transform.rotate(sprite5, clown.angle), (clown.x, clown.y))
         else:
-            win.blit(pygame.transform.rotate(sprite, boid.angle), (boid.x, boid.y))
+            win.blit(pygame.transform.rotate(sprite, clown.angle), (clown.x, clown.y))
         if checker % 10 == 0:
-            for b in boids:
-                if b != boid:
-                    b.alignment_accel(boid)
-                    b.avoid(boid)
-                    b.center_of_gravity(boid)
-        boid.move()
-        boid.walls(W, H)
+            for b in barracudas:
+                clown.run_away(b)
+                if (counter==100):
+                    b.hunt(clown)
+
+            for b in clownfishes:
+                if b != clown:
+                    if b.co_rect.colliderect(clown.co_rect):
+                        b.alignment_accel(clown)
+                        b.avoid(clown)
+                        b.center_of_gravity(clown)
+                        b.do_panic(clown)
+        clown.move()
+        clown.walls(W, H)
+
+
+    for barracuda in barracudas:
+        win.blit(pygame.transform.rotate(barracuda_sprite, barracuda.angle), (barracuda.x, barracuda.y))
+        if checker % 10 == 0:
+            for b in barracudas:
+                if b != barracuda:
+                    b.alignment_accel(barracuda)
+                    b.avoid(barracuda)
+                    b.center_of_gravity(barracuda)
+
+        barracuda.move()
+        barracuda.walls(W, H)
+
+
+
+
     # --------
     # обновление экрана
     #win.blit(seaweed, (120, 300))

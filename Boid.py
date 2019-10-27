@@ -8,12 +8,8 @@ class Boid:
     def __init__(self, W, H):
         self.x = random.randint(20, W - 20)
         self.y = random.randint(20, H - 20)
-        self.x_center = self.x + 13
-        self.y_center = self.y - 13
-
         self.dx = random.randint(15, 20)/50*random.choice([-1, 1])
         self.dy = random.randint(15, 20)/50*random.choice([-1, 1])
-        self.rect = pygame.Rect(self.x-15, self.y+15, 55, 55)
 
         self.avoid_dx = 0
         self.avoid_dy = 0
@@ -21,29 +17,13 @@ class Boid:
         self.aligm_dy = self.dy
         self.cohes_dx = 0
         self.cohes_dy = 0
-
-        self.avoid_rect = pygame.Rect(self.x-7, self.y + 7, 39, 39)
-        #self.co_rect = pygame.Rect(self.x-30, self.y+30, 85, 85)
-        self.co_rect = pygame.Rect(self.x-25, self.y+25, 75, 75)
+        self.lim = 0.1
 
         self.neighbors = 1;
         self.cohesion_x = self.x;
         self.cohesion_y = self.y;
         self.angle = math.atan(self.dy/self.dx)*180/math.pi
 
-    def move(self):
-
-        self.cohesion()
-
-        #print("%.3f" % self.dx, "%.3f" % self.avoid_dx, "%.3f" % self.aligm_dx, "%.3f" % self.cohes_dx, sep="\t")
-
-        self.dx = (self.dx*5 + self.avoid_dx + self.aligm_dx/3 + self.cohes_dx/3)/2
-        self.dy = (self.dy*5 + self.avoid_dy + self.aligm_dy/3 + self.cohes_dy/3)/2
-        self.speed_limit()
-
-        self.x += self.dx
-        self.y += self.dy
-        self.update()
 
 #    def change_a
     def update(self):
@@ -53,9 +33,9 @@ class Boid:
         if self.dy > 0 and self.dx > 0:
             self.angle += 180
 
-        self.neighbors = 0;
-        self.cohesion_x = 0;
-        self.cohesion_y = 0;
+        self.neighbors = 0
+        self.cohesion_x = 0
+        self.cohesion_y = 0
         self.avoid_dx = self.dx
         self.avoid_dy = self.dy
         self.aligm_dx = self.dx
@@ -63,15 +43,6 @@ class Boid:
         self.cohes_dx = 0
         self.cohes_dy = 0
 
-        self.x_center = self.x + 13
-        self.y_center = self.y - 13
-
-        self.rect.x = self.x - 15
-        self.rect.y = self.y + 15
-        self.avoid_rect.x = self.x - 7
-        self.avoid_rect.y = self.y + 7
-        self.co_rect.x = self.x - 25
-        self.co_rect.y = self.y + 25
 
     def d_lim(self, speed):
         lim = 1
@@ -80,10 +51,8 @@ class Boid:
         return speed
 
     def speed_limit(self):
-        lim = 0.7
         const = 0.16
-
-        while self.dx > lim or self.dy > lim or self.dx < -lim or self.dy < -lim:
+        while abs(self.dx) > self.lim or abs(self.dy) > self.lim:
             self.dx /= 1.2
             self.dy /= 1.2
             """
@@ -171,7 +140,6 @@ class Boid:
             boid.aligm_dy = self.d_lim(self.aligm_dy/const + boid.aligm_dy)
 
     def center_of_gravity(self, boid):
-        if self.co_rect.colliderect(boid.co_rect):
             self.cohesion_x += boid.x
             self.cohesion_y += boid.y
 
