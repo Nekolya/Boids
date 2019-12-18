@@ -6,20 +6,14 @@ from Boid import Boid
 import time
 
 # здесь определяются константы, классы и функции
-FPS = 200
+FPS = 120
 W = 1024
 H = 600
-lenght_clown = 120
+lenght_clown = 180
 
-lenght_barracuda = 4
+lenght_barracuda = 5
 clownfishes = []
 barracudas = []
-
-for b in range(lenght_clown):
-    clownfishes.append(Clownfish(W, H))
-
-for b in range(lenght_barracuda):
-    barracudas.append(Barracuda(W, H))
  
 # здесь происходит инициация, создание объектов и др.
 pygame.init()
@@ -37,6 +31,7 @@ mode = 0
 
 if mode:
     FPS = 120
+    lenght_clown = 180
     sprite = pygame.transform.scale(pygame.image.load("images/fish.png"), (8, 17))
     sprite2 = pygame.transform.scale(pygame.image.load("images/fish2.png"), (8, 17))
     sprite3 = pygame.transform.scale(pygame.image.load("images/fish3.png"), (8, 17))
@@ -44,6 +39,7 @@ if mode:
     sprite5 = pygame.transform.scale(pygame.image.load("images/fish5.png"), (8, 17))
     barracuda_sprite = pygame.transform.scale(pygame.image.load("images/barracuda2.png"), (9, 30))
 else:
+    lenght_clown = 150
     sprite = pygame.transform.scale(pygame.image.load("images/fish.png"), (10, 20))
     sprite2 = pygame.transform.scale(pygame.image.load("images/fish2.png"), (10, 20))
     sprite3 = pygame.transform.scale(pygame.image.load("images/fish3.png"), (10, 20))
@@ -51,11 +47,15 @@ else:
     sprite5 = pygame.transform.scale(pygame.image.load("images/fish5.png"), (10, 20))
     barracuda_sprite = pygame.transform.scale(pygame.image.load("images/barracuda2.png"), (12, 40))
 
+
+for b in range(lenght_clown):
+    clownfishes.append(Clownfish(W, H))
+
+for b in range(lenght_barracuda):
+    barracudas.append(Barracuda(W, H))
+    
 seaweed = pygame.transform.scale(pygame.image.load("images/seaweed.png"), (70, 310))
 corals = pygame.transform.scale(pygame.image.load("images/coral_reef.png"), (W+20, 220))
-
-
-
 
 #sprite = pygame.transform.scale(sprite, (13, 20))
 #sprite = pygame.transform.scale(sprite, (15, 25))
@@ -88,51 +88,48 @@ while True:
     pygame.draw.circle(win, (60, 185, 230), (-100, - 600), 800)
     pygame.draw.circle(win, (80, 215, 230), (-100, - 600), 700)
     pygame.draw.circle(win, (180, 240, 250), (-100, - 600), 630)
-
-
     counter = 0
-    for clown in clownfishes:
 
-        counter += 1
-        if counter % 5 == 0:
-            win.blit(pygame.transform.rotate(sprite2, clown.angle), (clown.x, clown.y))
-        elif counter % 6 == 0:
-            win.blit(pygame.transform.rotate(sprite3, clown.angle), (clown.x, clown.y))
-        elif counter % 4 == 0:
-            win.blit(pygame.transform.rotate(sprite4, clown.angle), (clown.x, clown.y))
-        elif counter % 7 == 0:
-            win.blit(pygame.transform.rotate(sprite5, clown.angle), (clown.x, clown.y))
-        else:
-            win.blit(pygame.transform.rotate(sprite, clown.angle), (clown.x, clown.y))
-        if checker % 10 == 0:
-            for b in barracudas:
-                clown.run_away(b)
-                if (counter==100):
-                    b.hunt(clown)
-
-            for b in clownfishes:
-                if b != clown:
-                    if b.co_rect.colliderect(clown.co_rect):
-                        b.alignment_accel(clown)
-                        b.avoid(clown)
-                        b.center_of_gravity(clown)
-                        b.do_panic(clown)
-        clown.move()
-        clown.walls(W, H)
-
+    for i in range(len(clownfishes)):
+            counter += 1
+            neighbours_counter = 0
+            if counter % 5 == 0:
+                win.blit(pygame.transform.rotate(sprite2, clownfishes[i].angle), (clownfishes[i].x, clownfishes[i].y))
+            elif counter % 6 == 0:
+                win.blit(pygame.transform.rotate(sprite3, clownfishes[i].angle), (clownfishes[i].x, clownfishes[i].y))
+            elif counter % 4 == 0:
+                win.blit(pygame.transform.rotate(sprite4, clownfishes[i].angle), (clownfishes[i].x, clownfishes[i].y))
+            elif counter % 7 == 0:
+                win.blit(pygame.transform.rotate(sprite5, clownfishes[i].angle), (clownfishes[i].x, clownfishes[i].y))
+            else:
+                win.blit(pygame.transform.rotate(sprite, clownfishes[i].angle), (clownfishes[i].x, clownfishes[i].y))
+            if checker % 10 == 0:
+                for b in barracudas:
+                    clownfishes[i].run_away(b)
+                    if (counter == 100):
+                        b.hunt(clownfishes[i])
+                if neighbours_counter < 7:
+                    neighbours_counter += 1
+                    for j in range(i+1, len(clownfishes)):
+                            if clownfishes[j].co_rect.colliderect(clownfishes[i].co_rect):
+                                clownfishes[j].alignment_accel(clownfishes[i])
+                                clownfishes[j].avoid(clownfishes[i])
+                                clownfishes[j].center_of_gravity(clownfishes[i])
+                                clownfishes[j].do_panic(clownfishes[i])
+            clownfishes[i].move()
+            clownfishes[i].walls(W, H)
 
     for barracuda in barracudas:
-        win.blit(pygame.transform.rotate(barracuda_sprite, barracuda.angle), (barracuda.x, barracuda.y))
-        if checker % 10 == 0:
-            for b in barracudas:
-                if b != barracuda:
-                    b.alignment_accel(barracuda)
-                    b.avoid(barracuda)
-                    b.center_of_gravity(barracuda)
+            win.blit(pygame.transform.rotate(barracuda_sprite, barracuda.angle), (barracuda.x, barracuda.y))
+            if checker % 10 == 0:
+                for b in barracudas:
+                    if b != barracuda:
+                        #b.alignment_accel(barracuda)
+                        b.avoid(barracuda)
+                        #b.center_of_gravity(barracuda)
 
-        barracuda.move()
-        barracuda.walls(W, H)
-
+            barracuda.move()
+            barracuda.walls(W, H)
 
 
 

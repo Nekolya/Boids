@@ -27,11 +27,14 @@ class Boid:
 
 #    def change_a
     def update(self):
-        self.angle = math.atan(self.dy / self.dx)*180/math.pi
-        if self.dy > 0 and self.dx < 0:
-            self.angle += 180
-        if self.dy > 0 and self.dx > 0:
-            self.angle += 180
+        if self.dy ==0:
+            self.angle = 0
+        else:
+            self.angle = math.atan(self.dy / self.dx)*180/math.pi
+            if self.dy > 0 and self.dx < 0:
+                self.angle += 180
+            elif self.dy > 0 and self.dx > 0:
+                self.angle += 180
 
         self.neighbors = 0
         self.cohesion_x = 0

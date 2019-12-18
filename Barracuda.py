@@ -6,7 +6,7 @@ class Barracuda(Boid):
     def __init__(self, h, w):
         super().__init__(h, w)
 
-        self.lim = 0.45
+        self.lim = 0.6
 
         self.x /= 2
         self.y /= 2
@@ -19,8 +19,9 @@ class Barracuda(Boid):
 
         self.rect = pygame.Rect(self.x-25, self.y+15, 125, 105)
         self.avoid_rect = pygame.Rect(self.x-17, self.y + 7, 110, 90)
-        #self.co_rect = pygame.Rect(self.x-30, self.y+30, 85, 85)
+        self.hunting_rect = pygame.Rect(self.x-30, self.y+30, 130, 130)
         self.co_rect = pygame.Rect(self.x-25, self.y+25, 120, 120)
+
 
     def update(self):
         super().update()
@@ -55,33 +56,39 @@ class Barracuda(Boid):
 
         self.cohesion()
 
+        rand = random.randint(0, 2000)
+        if rand == 1:
+            self.dx = -self.dx
+            self.dy = -self.dy
+        elif rand == 2:
+            self.dx = -self.dx
+        elif rand == 3:
+            self.dy = -self.dy
+
+
         #print("%.3f" % self.dx, "%.3f" % self.avoid_dx, "%.3f" % self.aligm_dx, "%.3f" % self.cohes_dx, sep="\t")
 
         self.dx = (self.dx*5 + self.avoid_dx + self.aligm_dx/3 + self.cohes_dx/3 + self.hunt_dx)/2
         self.dy = (self.dy*5 + self.avoid_dy + self.aligm_dy/3 + self.cohes_dy/3 + self.hunt_dy)/2
         self.speed_limit()
-        rand = random.randint(0, 5000)
-        if rand == 1:
-            self.dx = -self.dx
-            self.dy = -self.dy
+
         self.x += self.dx
         self.y += self.dy
         self.update()
 
     def hunt(self, clown):
-        if self.avoid_rect.colliderect(clown.avoid_rect):
+        if self.hunting_rect.colliderect(clown.run_away_rect):
             x = clown.x - self.x
             y = clown.x - self.x
-            cot = abs(x/y)
-            tan = abs(y/x)
+            const = 1
             if x > 0:
-                self.hunt_dx += cot
+                self.hunt_dx += const
             else:
-                self.hunt_dx += -cot
+                self.hunt_dx += -const
             if y > 0:
-                self.hunt_dy += tan
+                self.hunt_dy += const
             else:
-                self.hunt_dy += -tan
+                self.hunt_dy += -const
 
             self.aligm_dx = self.hunt_dx
             self.aligm_dy = self.hunt_dy
