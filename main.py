@@ -1,10 +1,12 @@
 # здесь подключаются модули
+import random
 import pygame
 from Clownfish import Clownfish
 from Barracuda import Barracuda
 from Boid import Boid
 import time
 
+#random.seed(4)
 # здесь определяются константы, классы и функции
 FPS = 120
 W = 1024
@@ -14,7 +16,7 @@ lenght_clown = 120
 lenght_barracuda = 0
 clownfishes = []
 barracudas = []
- 
+
 # здесь происходит инициация, создание объектов и др.
 pygame.init()
 win = pygame.display.set_mode((W+240, H))
@@ -72,10 +74,14 @@ corals = pygame.transform.scale(pygame.image.load("images/coral_reef.png"), (W+2
 checker = 0
 many_flag = 0
 #time.sleep(20)
-
+seed_counter = 0
 # главный цикл
 while True:
- 
+    """
+    seed_counter += 1
+    if seed_counter == 150:
+        seed_counter = 0
+        print( 'x = ','%.2f' % clownfishes[0].x, 'y = ', '%.2f' % clownfishes[0].y)"""
     # задержка
     clock.tick(FPS)
     checker += 1
@@ -114,16 +120,15 @@ while True:
             if checker % 10 == 0:
                 for b in barracudas:
                     clownfishes[i].run_away(b)
-                    if (counter == 100):
+                    if counter == 100:
                         b.hunt(clownfishes[i])
-                if neighbours_counter < 7:
-                    neighbours_counter += 1
-                    for j in range(i+1, len(clownfishes)):
-                            if clownfishes[j].co_rect.colliderect(clownfishes[i].co_rect):
-                                clownfishes[j].alignment_accel(clownfishes[i])
-                                clownfishes[j].avoid(clownfishes[i])
-                                clownfishes[j].center_of_gravity(clownfishes[i])
-                                clownfishes[j].do_panic(clownfishes[i])
+
+                for j in range(i+1, len(clownfishes)):
+                    if clownfishes[j].co_rect.colliderect(clownfishes[i].co_rect):
+                        clownfishes[j].alignment_accel(clownfishes[i])
+                        clownfishes[j].avoid(clownfishes[i])
+                        clownfishes[j].center_of_gravity(clownfishes[i])
+                        clownfishes[j].do_panic(clownfishes[i])
             clownfishes[i].move()
             clownfishes[i].walls(W, H)
 
@@ -132,9 +137,7 @@ while True:
             if checker % 10 == 0:
                 for b in barracudas:
                     if b != barracuda:
-                        #b.alignment_accel(barracuda)
                         b.avoid(barracuda)
-                        #b.center_of_gravity(barracuda)
 
             barracuda.move()
             barracuda.walls(W, H)
@@ -160,13 +163,11 @@ while True:
 
     many = font.render("Too many fishes!", 1, (30, 0, 0))
     if many_flag:
-        many_flag-=1
+        many_flag -= 1
         win.blit(many, (1040, 530))
 
     # proceed events
     for event in ev:
-
-        # handle MOUSEBUTTONUP
         if event.type == pygame.MOUSEBUTTONUP:
             pos = pygame.mouse.get_pos()
             add1 = pygame.Rect(1045, 100, 117, 34)
@@ -199,14 +200,9 @@ while True:
                 if len(barracudas) > 0:
                     barracudas.pop()
 
-
-
     clown_counter = font.render("Clownfishes: " + str(len(clownfishes)), 1, (180, 0, 0))
     barracuda_counter = font.render("Barracudas: " + str(len(barracudas)), 1, (180, 0, 0))
     win.blit(clown_counter, (1045, 440))
     win.blit(barracuda_counter, (1045, 480))
 
-    # --------
-    # обновление экрана
-    #win.blit(seaweed, (120, 300))
     pygame.display.update()

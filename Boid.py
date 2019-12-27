@@ -3,7 +3,6 @@ import pygame
 import time
 import math
 
-
 class Boid:
     def __init__(self, W, H):
         self.x = random.randint(20, W - 20)
@@ -18,6 +17,10 @@ class Boid:
         self.cohes_dx = 0
         self.cohes_dy = 0
         self.lim = 0.1
+
+        self.rect = pygame.Rect(self.x - 15, self.y + 15, 55, 55)
+        self.avoid_rect = pygame.Rect(self.x - 7, self.y + 7, 39, 39)
+        self.co_rect = pygame.Rect(self.x-30, self.y+30, 85, 85)
 
         self.neighbors = 1;
         self.cohesion_x = self.x;
@@ -149,7 +152,7 @@ class Boid:
             self.neighbors += 1
 
     def cohesion(self):
-        if self.neighbors > 6:
+        if self.neighbors > 3:
             x = self.cohesion_x/self.neighbors
             y = self.cohesion_y/self.neighbors
 
